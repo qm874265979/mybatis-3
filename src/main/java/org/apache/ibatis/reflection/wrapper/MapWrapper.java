@@ -25,10 +25,13 @@ import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
+ * 继承 BaseWrapper 抽象类，Map 对象的 ObjectWrapper 实现类。
+ * MapWrapper 和 BeanWrapper 的大体逻辑是一样的，差异点主要如下：①object 变成了 map。②属性的操作变了
  * @author Clinton Begin
  */
 public class MapWrapper extends BaseWrapper {
 
+  // ①object 变成了 map
   private final Map<String, Object> map;
 
   public MapWrapper(MetaObject metaObject, Map<String, Object> map) {
@@ -42,6 +45,7 @@ public class MapWrapper extends BaseWrapper {
       Object collection = resolveCollection(prop, map);
       return getCollectionValue(prop, collection);
     } else {
+      //②属性的操作变了
       return map.get(prop.getName());
     }
   }
