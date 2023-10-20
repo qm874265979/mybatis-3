@@ -23,6 +23,8 @@ import org.apache.ibatis.reflection.factory.ObjectFactory;
 import org.apache.ibatis.reflection.property.PropertyTokenizer;
 
 /**
+ * 实现 ObjectWrapper 接口，集合 ObjectWrapper 实现类。
+ * 仅仅支持 #add(Object element) 和 #addAll(List<E> element) 两个操作方法。
  * @author Clinton Begin
  */
 public class CollectionWrapper implements ObjectWrapper {
