@@ -25,6 +25,7 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.reflection.SystemMetaObject;
 
 /**
+ * 实现 DataSourceFactory 接口，非池化的 DataSourceFactory 实现类。
  * @author Clinton Begin
  */
 public class UnpooledDataSourceFactory implements DataSourceFactory {
@@ -32,29 +33,39 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
   private static final String DRIVER_PROPERTY_PREFIX = "driver.";
   private static final int DRIVER_PROPERTY_PREFIX_LENGTH = DRIVER_PROPERTY_PREFIX.length();
 
+  /**
+   * DataSource 对象
+   */
   protected DataSource dataSource;
 
   public UnpooledDataSourceFactory() {
+    // 创建 UnpooledDataSource 对象
     this.dataSource = new UnpooledDataSource();
   }
 
   @Override
   public void setProperties(Properties properties) {
     Properties driverProperties = new Properties();
+    // 创建 dataSource 对应的 MetaObject 对象
     MetaObject metaDataSource = SystemMetaObject.forObject(dataSource);
+    // 遍历 properties 属性，初始化到 driverProperties 和 MetaObject 中
     for (Object key : properties.keySet()) {
       String propertyName = (String) key;
-      if (propertyName.startsWith(DRIVER_PROPERTY_PREFIX)) {
+      // 初始化到 driverProperties 中
+      if (propertyName.startsWith(DRIVER_PROPERTY_PREFIX)) {// 以 "driver." 开头的配置
         String value = properties.getProperty(propertyName);
         driverProperties.setProperty(propertyName.substring(DRIVER_PROPERTY_PREFIX_LENGTH), value);
+        // 初始化到 MetaObject 中
       } else if (metaDataSource.hasSetter(propertyName)) {
         String value = (String) properties.get(propertyName);
+        // <1> 转化属性
         Object convertedValue = convertValue(metaDataSource, propertyName, value);
         metaDataSource.setValue(propertyName, convertedValue);
       } else {
         throw new DataSourceException("Unknown DataSource property: " + propertyName);
       }
     }
+    // 设置 driverProperties 到 MetaObject 中
     if (driverProperties.size() > 0) {
       metaDataSource.setValue("driverProperties", driverProperties);
     }
@@ -67,7 +78,9 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
 
   private Object convertValue(MetaObject metaDataSource, String propertyName, String value) {
     Object convertedValue = value;
+    // 获得该属性的 setting 方法的参数类型
     Class<?> targetType = metaDataSource.getSetterType(propertyName);
+    // 转化
     if (targetType == Integer.class || targetType == int.class) {
       convertedValue = Integer.valueOf(value);
     } else if (targetType == Long.class || targetType == long.class) {
@@ -75,6 +88,7 @@ public class UnpooledDataSourceFactory implements DataSourceFactory {
     } else if (targetType == Boolean.class || targetType == boolean.class) {
       convertedValue = Boolean.valueOf(value);
     }
+    // 返回
     return convertedValue;
   }
 
