@@ -25,6 +25,7 @@ import org.apache.ibatis.transaction.Transaction;
 import org.apache.ibatis.transaction.TransactionFactory;
 
 /**
+ * 实现 TransactionFactory 接口，ManagedTransaction 工厂实现类
  * Creates {@link ManagedTransaction} instances.
  *
  * @author Clinton Begin
@@ -33,10 +34,14 @@ import org.apache.ibatis.transaction.TransactionFactory;
  */
 public class ManagedTransactionFactory implements TransactionFactory {
 
+  /**
+   * 是否关闭连接
+   */
   private boolean closeConnection = true;
 
   @Override
   public void setProperties(Properties props) {
+    // 获得是否关闭连接属性
     if (props != null) {
       String closeConnectionProperty = props.getProperty("closeConnection");
       if (closeConnectionProperty != null) {
@@ -47,6 +52,7 @@ public class ManagedTransactionFactory implements TransactionFactory {
 
   @Override
   public Transaction newTransaction(Connection conn) {
+    // 创建 ManagedTransaction 对象
     return new ManagedTransaction(conn, closeConnection);
   }
 
@@ -55,6 +61,7 @@ public class ManagedTransactionFactory implements TransactionFactory {
     // Silently ignores autocommit and isolation level, as managed transactions are entirely
     // controlled by an external manager.  It's silently ignored so that
     // code remains portable between managed and unmanaged configurations.
+    // 创建 ManagedTransaction 对象
     return new ManagedTransaction(ds, level, closeConnection);
   }
 }
