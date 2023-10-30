@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * <p>定义在 Mapper 接口中的方法能够调用 SqlSession#flushStatements() 方法</p>
  * The maker annotation that invoke a flush statements via Mapper interface.
  *
  * <p>

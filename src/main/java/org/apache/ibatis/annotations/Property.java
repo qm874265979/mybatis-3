@@ -21,6 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * <p>指定参数值或占位值（placeholder）</p>
  * The annotation that inject a property value.
  *
  * @since 3.4.2

@@ -26,6 +26,7 @@ import org.apache.ibatis.cache.decorators.LruCache;
 import org.apache.ibatis.cache.impl.PerpetualCache;
 
 /**
+ * <p>为给定的命名空间（比如类）配置缓存</p>
  * The annotation that specify to use cache on namespace(e.g. mapper interface).
  *
  * <p>
