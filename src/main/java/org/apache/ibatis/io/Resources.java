@@ -26,15 +26,20 @@ import java.nio.charset.Charset;
 import java.util.Properties;
 
 /**
+ * <p>Resource 工具类</p>
  * A class to simplify access to resources through the classloader.
  *
  * @author Clinton Begin
  */
 public class Resources {
 
+  /**
+   * ClassLoaderWrapper 对象
+   */
   private static ClassLoaderWrapper classLoaderWrapper = new ClassLoaderWrapper();
 
   /**
+   * <p>字符集</p>
    * Charset to use when calling getResourceAsReader.
    * null means use the system default.
    */
@@ -58,10 +63,12 @@ public class Resources {
    * @param defaultClassLoader - the new default ClassLoader
    */
   public static void setDefaultClassLoader(ClassLoader defaultClassLoader) {
+    // 修改 ClassLoaderWrapper.
     classLoaderWrapper.defaultClassLoader = defaultClassLoader;
   }
 
   /**
+   * <p>获得指定资源的 URL</p>
    * Returns the URL of the resource on the classpath
    *
    * @param resource The resource to find
@@ -74,6 +81,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定资源和类加载器的 URL</p>
    * Returns the URL of the resource on the classpath
    *
    * @param loader   The classloader used to fetch the resource
@@ -90,6 +98,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定资源的 InputStream</p>
    * Returns a resource on the classpath as a Stream object
    *
    * @param resource The resource to find
@@ -101,6 +110,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定资源和类加载器的 InputStream</p>
    * Returns a resource on the classpath as a Stream object
    *
    * @param loader   The classloader used to fetch the resource
@@ -117,6 +127,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定资源的 Properties</p>
    * Returns a resource on the classpath as a Properties object
    *
    * @param resource The resource to find
@@ -132,6 +143,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定资源和类加载器的 Properties</p>
    * Returns a resource on the classpath as a Properties object
    *
    * @param loader   The classloader used to fetch the resource
@@ -148,6 +160,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定资源的 Reader </p>
    * Returns a resource on the classpath as a Reader object
    *
    * @param resource The resource to find
@@ -165,6 +178,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定资源和类加载器的 Reader </p>
    * Returns a resource on the classpath as a Reader object
    *
    * @param loader   The classloader used to fetch the resource
@@ -183,6 +197,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定资源的 File</p>
    * Returns a resource on the classpath as a File object
    *
    * @param resource The resource to find
@@ -194,6 +209,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定资源和类加载器的 File</p>
    * Returns a resource on the classpath as a File object
    *
    * @param loader   - the classloader used to fetch the resource
@@ -206,6 +222,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定 URL</p>
    * Gets a URL as an input stream
    *
    * @param urlString - the URL to get
@@ -219,6 +236,7 @@ public class Resources {
   }
 
   /**
+   * <p>指定 URL 的 Reader </p>
    * Gets a URL as a Reader
    *
    * @param urlString - the URL to get
@@ -236,6 +254,7 @@ public class Resources {
   }
 
   /**
+   * <p>指定 URL 的 Properties </p>
    * Gets a URL as a Properties object
    *
    * @param urlString - the URL to get
@@ -251,6 +270,7 @@ public class Resources {
   }
 
   /**
+   * <p>获得指定类名对应的类</p>
    * Loads a class
    *
    * @param className - the class to fetch
