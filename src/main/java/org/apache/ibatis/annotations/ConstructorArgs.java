@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ *  <p>收集一组结果传递给一个结果对象的构造方法</p>
  * The annotation that be grouping mapping definitions for constructor.
  *
  * <p>

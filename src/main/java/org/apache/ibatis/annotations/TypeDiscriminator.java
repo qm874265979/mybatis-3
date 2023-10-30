@@ -26,6 +26,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
+ * <p>一组实例值被用来决定结果映射的表现</p>
  * The annotation that be grouping conditional mapping definitions.
  *
  * <p>

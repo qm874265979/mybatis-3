@@ -27,6 +27,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
+ * <p>结果字段的注解</p>
  * The annotation that specify a mapping definition for the property.
  *
  * @see Results

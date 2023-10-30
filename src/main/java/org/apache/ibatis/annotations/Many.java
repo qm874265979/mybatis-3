@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 import org.apache.ibatis.mapping.FetchType;
 
 /**
+ * <p>复杂类型的集合属性值的注解</p>
  * The annotation that specify the nested statement for retrieving collections.
  *
  * @see Result

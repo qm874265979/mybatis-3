@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * <p>使用的结果集的注解</p>
  * The annotation that specify result map names to use.
  *
  * <p>

@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * <p>结果的注解</p>
  * The annotation that be grouping mapping definitions for property.
  *
  * <p>

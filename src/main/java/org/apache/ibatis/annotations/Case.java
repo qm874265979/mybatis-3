@@ -21,6 +21,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * <p>单独实例的值和它对应的映射</p>
  * The annotation that conditional mapping definition for {@link TypeDiscriminator}.
  *
  * @see TypeDiscriminator

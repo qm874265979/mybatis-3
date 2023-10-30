@@ -23,6 +23,7 @@ import java.lang.annotation.Target;
 import org.apache.ibatis.mapping.FetchType;
 
 /**
+ * <p>复杂类型的单独属性值映射</p>
  * The annotation that specify the nested statement for retrieving single object.
  *
  * @see Result

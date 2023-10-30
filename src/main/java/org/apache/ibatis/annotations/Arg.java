@@ -27,6 +27,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.UnknownTypeHandler;
 
 /**
+ * <p>单参数构造方法，是 ConstructorArgs 集合的一部分</p>
  * The annotation that specify a mapping definition for the constructor argument.
  *
  * @see ConstructorArgs
