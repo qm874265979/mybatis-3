@@ -26,6 +26,13 @@ import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 
 /**
+ * <p>继承 VFS 抽象类，基于 JBoss 的 VFS 实现类。使用时，需要引入如下：
+ * <dependency>
+ *     <groupId>org.jboss</groupId>
+ *     <artifactId>jboss-vfs</artifactId>
+ *     <version>${version></version>
+ * </dependency>
+ * </p>
  * A {@link VFS} implementation that works with the VFS API provided by JBoss 6.
  *
  * @author Ben Gunter
