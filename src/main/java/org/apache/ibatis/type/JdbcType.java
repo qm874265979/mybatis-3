@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Jdbc Type 枚举
  * @author Clinton Begin
  */
 public enum JdbcType {
@@ -69,7 +70,13 @@ public enum JdbcType {
   TIME_WITH_TIMEZONE(Types.TIME_WITH_TIMEZONE), // JDBC 4.2 JDK8
   TIMESTAMP_WITH_TIMEZONE(Types.TIMESTAMP_WITH_TIMEZONE); // JDBC 4.2 JDK8
 
+  /**
+   * 类型编号。嘿嘿，此处代码不规范
+   */
   public final int TYPE_CODE;
+  /**
+   * 代码编号和 {@link JdbcType} 的映射
+   */
   private static Map<Integer,JdbcType> codeLookup = new HashMap<>();
 
   static {
