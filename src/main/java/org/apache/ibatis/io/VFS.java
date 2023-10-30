@@ -28,6 +28,7 @@ import org.apache.ibatis.logging.Log;
 import org.apache.ibatis.logging.LogFactory;
 
 /**
+ * <p>虚拟文件系统( Virtual File System )抽象类，用来查找指定路径下的的文件们</p>
  * Provides a very simple API for accessing resources within an application server.
  *
  * @author Ben Gunter
@@ -36,12 +37,12 @@ public abstract class VFS {
   private static final Log log = LogFactory.getLog(VFS.class);
 
   /** The built-in implementations. */
-  public static final Class<?>[] IMPLEMENTATIONS = { JBoss6VFS.class, DefaultVFS.class };
+  public static final Class<?>[] IMPLEMENTATIONS = { JBoss6VFS.class, DefaultVFS.class };// 内置的 VFS 实现类的数组
 
   /**
    * The list to which implementations are added by {@link #addImplClass(Class)}.
    */
-  public static final List<Class<? extends VFS>> USER_IMPLEMENTATIONS = new ArrayList<>();
+  public static final List<Class<? extends VFS>> USER_IMPLEMENTATIONS = new ArrayList<>();// 自定义的 VFS 实现类的数组
 
   /** Singleton instance holder. */
   private static class VFSHolder {
@@ -55,6 +56,7 @@ public abstract class VFS {
       impls.addAll(Arrays.asList((Class<? extends VFS>[]) IMPLEMENTATIONS));
 
       // Try each implementation class until a valid one is found
+      // 创建 VFS 对象，选择最后一个符合的
       VFS vfs = null;
       for (int i = 0; vfs == null || !vfs.isValid(); i++) {
         Class<? extends VFS> impl = impls.get(i);
@@ -79,6 +81,7 @@ public abstract class VFS {
   }
 
   /**
+   * <p>获得 VFS 单例。懒汉式，线程安全</p>
    * Get the singleton {@link VFS} instance. If no {@link VFS} implementation can be found for the current environment,
    * then this method returns null.
    *
@@ -179,6 +182,7 @@ public abstract class VFS {
   }
 
   /**
+   * <p>获得指定路径下的 URL 数组</p>
    * Get a list of {@link URL}s from the context classloader for all the resources found at the
    * specified path.
    *
@@ -191,6 +195,7 @@ public abstract class VFS {
   }
 
   /**
+   * <p>判断是否为合法的 VFS</p>
    * Return true if the {@link VFS} implementation is valid for the current environment.
    *
    * @return true, if is valid
@@ -198,6 +203,7 @@ public abstract class VFS {
   public abstract boolean isValid();
 
   /**
+   * <p>递归的列出所有的资源们</p>
    * Recursively list the full resource path of all the resources that are children of the
    * resource identified by a URL.
    *
@@ -210,6 +216,7 @@ public abstract class VFS {
   protected abstract List<String> list(URL url, String forPath) throws IOException;
 
   /**
+   * <p>获得指定路径下的所有资源</p>
    * Recursively list the full resource path of all the resources that are children of all the
    * resources found at the specified path.
    *
