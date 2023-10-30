@@ -22,6 +22,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * <p>Map 结果的键的注解</p>
  * The annotation that specify the property name(or column name) for a key value of {@link java.util.Map}.
  *
  * <p>

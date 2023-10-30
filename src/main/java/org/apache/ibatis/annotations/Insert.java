@@ -23,6 +23,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
+ * <p>插入语句注解</p>
  * The annotation that specify an SQL for inserting record(s).
  *
  * <p>

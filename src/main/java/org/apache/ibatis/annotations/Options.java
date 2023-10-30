@@ -26,6 +26,7 @@ import org.apache.ibatis.mapping.ResultSetType;
 import org.apache.ibatis.mapping.StatementType;
 
 /**
+ * <p>操作可选项</p>
  * The annotation that specify options for customizing default behaviors.
  *
  * <p>
