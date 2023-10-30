@@ -30,6 +30,7 @@ import org.apache.ibatis.reflection.ExceptionUtil;
 import org.apache.ibatis.session.SqlSession;
 
 /**
+ * 实现 InvocationHandler、Serializable 接口，Mapper Proxy
  * @author Clinton Begin
  * @author Eduardo Macarron
  */
@@ -40,8 +41,18 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
       | MethodHandles.Lookup.PACKAGE | MethodHandles.Lookup.PUBLIC;
   private static final Constructor<Lookup> lookupConstructor;
   private static final Method privateLookupInMethod;
+  /**
+   * SqlSession 对象
+   */
   private final SqlSession sqlSession;
+  /**
+   * Mapper 接口
+   */
   private final Class<T> mapperInterface;
+  /**
+   * 方法与 MapperMethod 的映射
+   * 从 {@link MapperProxyFactory#methodCache} 传递过来
+   */
   private final Map<Method, MapperMethodInvoker> methodCache;
 
   public MapperProxy(SqlSession sqlSession, Class<T> mapperInterface, Map<Method, MapperMethodInvoker> methodCache) {
@@ -79,9 +90,11 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
   @Override
   public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
     try {
+      // <1> 如果是 Object 定义的方法，直接调用
       if (Object.class.equals(method.getDeclaringClass())) {
         return method.invoke(this, args);
       } else {
+        //Mapper接口方法则缓存后再调用
         return cachedInvoker(method).invoke(proxy, method, args, sqlSession);
       }
     } catch (Throwable t) {
@@ -94,14 +107,18 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
       // A workaround for https://bugs.openjdk.java.net/browse/JDK-8161372
       // It should be removed once the fix is backported to Java 8 or
       // MyBatis drops Java 8 support. See gh-1929
+      //从缓存中获取
       MapperMethodInvoker invoker = methodCache.get(method);
+      //不为空直接返回
       if (invoker != null) {
         return invoker;
       }
-
+      //创建并缓存
       return methodCache.computeIfAbsent(method, m -> {
+        //判断是否为 default 修饰的方法
         if (m.isDefault()) {
           try {
+            //创建默认方法调用器DefaultMethodInvoker
             if (privateLookupInMethod == null) {
               return new DefaultMethodInvoker(getMethodHandleJava8(method));
             } else {
@@ -111,6 +128,7 @@ public class MapperProxy<T> implements InvocationHandler, Serializable {
               | NoSuchMethodException e) {
             throw new RuntimeException(e);
           }
+          //创建普通方法调用器PlainMethodInvoker
         } else {
           return new PlainMethodInvoker(new MapperMethod(mapperInterface, method, sqlSession.getConfiguration()));
         }
