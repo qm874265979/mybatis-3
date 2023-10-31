@@ -249,7 +249,7 @@ public class XMLMapperBuilder extends BaseBuilder {
     if (context != null) {
       // <1> 获得指向的 namespace 名字，并添加到 configuration 的 cacheRefMap 中
       configuration.addCacheRef(builderAssistant.getCurrentNamespace(), context.getStringAttribute("namespace"));
-      // <1> 获得指向的 namespace 名字，并添加到 configuration 的 cacheRefMap 中
+      // <2> 创建 CacheRefResolver 对象，并执行解析
       CacheRefResolver cacheRefResolver = new CacheRefResolver(builderAssistant, context.getStringAttribute("namespace"));
       try {
         cacheRefResolver.resolveCacheRef();
