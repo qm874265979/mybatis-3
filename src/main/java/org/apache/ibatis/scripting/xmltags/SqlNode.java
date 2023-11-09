@@ -16,8 +16,16 @@
 package org.apache.ibatis.scripting.xmltags;
 
 /**
+ * SqlNode 接口，每个 XML Node 会解析成对应的 SqlNode 对象
  * @author Clinton Begin
  */
 public interface SqlNode {
+
+  /**
+   * 应用当前 SQL Node 节点。为什么返回值类型是 boolean呢？具体在 ChooseSqlNode 可找到答案
+   *
+   * @param context 上下文
+   * @return 当前 SQL Node 节点是否应用成功。
+   */
   boolean apply(DynamicContext context);
 }

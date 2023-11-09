@@ -25,14 +25,30 @@ import java.util.StringTokenizer;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 实现 SqlNode 接口，<trim /> 标签的 SqlNode 实现类
  * @author Clinton Begin
  */
 public class TrimSqlNode implements SqlNode {
 
+  /**
+   * 内含的 SqlNode 节点
+   */
   private final SqlNode contents;
+  /**
+   * 前缀
+   */
   private final String prefix;
+  /**
+   * 后缀
+   */
   private final String suffix;
+  /**
+   * 需要被删除的前缀
+   */
   private final List<String> prefixesToOverride;
+  /**
+   * 需要被删除的后缀
+   */
   private final List<String> suffixesToOverride;
   private final Configuration configuration;
 
@@ -51,12 +67,18 @@ public class TrimSqlNode implements SqlNode {
 
   @Override
   public boolean apply(DynamicContext context) {
+    // <1> 创建 FilteredDynamicContext 对象
     FilteredDynamicContext filteredDynamicContext = new FilteredDynamicContext(context);
+    // <2> 执行 contents 的应用
     boolean result = contents.apply(filteredDynamicContext);
+    // <3> 调用 FilteredDynamicContext#applyAll() 方法，执行 FilteredDynamicContext 的应用
     filteredDynamicContext.applyAll();
     return result;
   }
 
+  /**
+   * 使用 | 分隔字符串成字符串数组，并都转换成大写
+   */
   private static List<String> parseOverrides(String overrides) {
     if (overrides != null) {
       final StringTokenizer parser = new StringTokenizer(overrides, "|", false);
@@ -69,10 +91,27 @@ public class TrimSqlNode implements SqlNode {
     return Collections.emptyList();
   }
 
+  /**
+   * 是 TrimSqlNode 的内部类，继承 DynamicContext 类，支持 trim 逻辑的 DynamicContext 实现类
+   */
   private class FilteredDynamicContext extends DynamicContext {
+    /**
+     * 委托的 DynamicContext 对象
+     */
     private DynamicContext delegate;
+    /**
+     * 是否 prefix 已经被应用
+     */
     private boolean prefixApplied;
+    /**
+     * 是否 suffix 已经被应用
+     */
     private boolean suffixApplied;
+    /**
+     * StringBuilder 对象
+     *
+     * @see #appendSql(String)
+     */
     private StringBuilder sqlBuffer;
 
     public FilteredDynamicContext(DynamicContext delegate) {
@@ -84,12 +123,18 @@ public class TrimSqlNode implements SqlNode {
     }
 
     public void applyAll() {
+      // <1> trim 掉多余的空格，生成新的 sqlBuffer 对象
       sqlBuffer = new StringBuilder(sqlBuffer.toString().trim());
+      // <2> 将 sqlBuffer 大写，生成新的 trimmedUppercaseSql 对象。为什么呢？
+      // 因为，TrimSqlNode 对 prefixesToOverride 和 suffixesToOverride 属性，都进行了大写的处理，需要保持统一。
+      // 但是，又不能直接修改 sqlBuffer ，因为这样就相当于修改了原始的 SQL 。
       String trimmedUppercaseSql = sqlBuffer.toString().toUpperCase(Locale.ENGLISH);
+      // <3> 应用 TrimSqlNode 的 trim 逻辑
       if (trimmedUppercaseSql.length() > 0) {
         applyPrefix(sqlBuffer, trimmedUppercaseSql);
         applySuffix(sqlBuffer, trimmedUppercaseSql);
       }
+      // <4> 将结果，添加到 delegate 中
       delegate.appendSql(sqlBuffer.toString());
     }
 
@@ -108,6 +153,10 @@ public class TrimSqlNode implements SqlNode {
       return delegate.getUniqueNumber();
     }
 
+    /**
+     * 该方法，将拼接的 sql ，暂时存储到 sqlBuffer 中。
+     * @see #applyAll() 最终，会通过该方法，将 sqlBuffer 处理完后，添加回 delegate.sqlBuffer 中。
+     */
     @Override
     public void appendSql(String sql) {
       sqlBuffer.append(sql);
@@ -121,6 +170,7 @@ public class TrimSqlNode implements SqlNode {
     private void applyPrefix(StringBuilder sql, String trimmedUppercaseSql) {
       if (!prefixApplied) {
         prefixApplied = true;
+        // suffixesToOverride 非空，先删除
         if (prefixesToOverride != null) {
           for (String toRemove : prefixesToOverride) {
             if (trimmedUppercaseSql.startsWith(toRemove)) {
@@ -129,6 +179,7 @@ public class TrimSqlNode implements SqlNode {
             }
           }
         }
+        // suffix 非空，再添加
         if (prefix != null) {
           sql.insert(0, " ");
           sql.insert(0, prefix);
