@@ -135,17 +135,22 @@ public class DynamicContext {
     }
   }
 
+  /**
+   * 是 DynamicContext 的内部静态类，实现 ognl.PropertyAccessor 接口，上下文访问器
+   */
   static class ContextAccessor implements PropertyAccessor {
 
     @Override
     public Object getProperty(Map context, Object target, Object name) {
       Map map = (Map) target;
 
+      // 优先从 ContextMap 中，获得属性
       Object result = map.get(name);
       if (map.containsKey(name) || result != null) {
         return result;
       }
 
+      // <x> 如果没有，则从 PARAMETER_OBJECT_KEY 对应的 Map 中，获得属性。为什么可以访问 PARAMETER_OBJECT_KEY 属性，并且是 Map 类型呢？回看 DynamicContext 构造方法，就可以明白了
       Object parameterObject = map.get(PARAMETER_OBJECT_KEY);
       if (parameterObject instanceof Map) {
         return ((Map)parameterObject).get(name);
