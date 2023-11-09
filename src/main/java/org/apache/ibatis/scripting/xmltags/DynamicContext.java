@@ -27,29 +27,51 @@ import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 动态 SQL ，用于每次执行 SQL 操作时，记录动态 SQL 处理后的最终 SQL 字符串
  * @author Clinton Begin
  */
 public class DynamicContext {
 
+  /**
+   * {@link #bindings} _parameter 的键，参数
+   */
   public static final String PARAMETER_OBJECT_KEY = "_parameter";
+
+  /**
+   * {@link #bindings} _databaseId 的键，数据库编号
+   */
   public static final String DATABASE_ID_KEY = "_databaseId";
 
   static {
+    // <1.2> 设置 OGNL 的属性访问器。其中，OgnlRuntime 是 ognl 库中的类。并且，ContextMap 对应的访问器是 ContextAccessor 类。
     OgnlRuntime.setPropertyAccessor(ContextMap.class, new ContextAccessor());
   }
 
+  /**
+   * 上下文的参数集合
+   */
   private final ContextMap bindings;
+  /**
+   * 生成后的 SQL
+   */
   private final StringJoiner sqlBuilder = new StringJoiner(" ");
+  /**
+   * 唯一编号。在 {@link org.apache.ibatis.scripting.xmltags.XMLScriptBuilder.ForEachHandler} 使用
+   */
   private int uniqueNumber = 0;
 
+  // 当需要使用到 OGNL 表达式时，parameterObject 非空。parameterObject 方法参数，当需要使用到 OGNL 表达式时，parameterObject 才会非空
   public DynamicContext(Configuration configuration, Object parameterObject) {
+    // <1> 初始化 bindings 参数，创建 ContextMap 对象
     if (parameterObject != null && !(parameterObject instanceof Map)) {
+      //调用 Configuration#newMetaObject(Object object) 方法，创建 MetaObject 对象，实现对 parameterObject 参数的访问
       MetaObject metaObject = configuration.newMetaObject(parameterObject);
       boolean existsTypeHandler = configuration.getTypeHandlerRegistry().hasTypeHandler(parameterObject.getClass());
       bindings = new ContextMap(metaObject, existsTypeHandler);
     } else {
       bindings = new ContextMap(null, false);
     }
+    // <2> 添加 bindings 的默认值
     bindings.put(PARAMETER_OBJECT_KEY, parameterObject);
     bindings.put(DATABASE_ID_KEY, configuration.getDatabaseId());
   }
@@ -70,6 +92,7 @@ public class DynamicContext {
     return sqlBuilder.toString().trim();
   }
 
+  //每次请求，获得新的序号
   public int getUniqueNumber() {
     return uniqueNumber++;
   }
