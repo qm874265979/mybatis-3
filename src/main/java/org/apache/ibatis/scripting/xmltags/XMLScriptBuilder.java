@@ -142,10 +142,22 @@ public class XMLScriptBuilder extends BaseBuilder {
     return new MixedSqlNode(contents);
   }
 
+  /**
+   * NodeHandler ，在 XMLScriptBuilder 类中，Node 处理器接口
+   */
   private interface NodeHandler {
+    /**
+     * 处理 Node
+     *
+     * @param nodeToHandle 要处理的 XNode 节点
+     * @param targetContents 目标的 SqlNode 数组。实际上，被处理的 XNode 节点会创建成对应的 SqlNode 对象，添加到 targetContents 中
+     */
     void handleNode(XNode nodeToHandle, List<SqlNode> targetContents);
   }
 
+  /**
+   * BindHandler ，实现 NodeHandler 接口，<bind /> 标签的处理器
+   */
   private class BindHandler implements NodeHandler {
     public BindHandler() {
       // Prevent Synthetic Access
@@ -153,13 +165,19 @@ public class XMLScriptBuilder extends BaseBuilder {
 
     @Override
     public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+      // 解析 name、value 属性
       final String name = nodeToHandle.getStringAttribute("name");
+      // 创建 VarDeclSqlNode 对象
       final String expression = nodeToHandle.getStringAttribute("value");
       final VarDeclSqlNode node = new VarDeclSqlNode(name, expression);
+      // 添加到 targetContents 中
       targetContents.add(node);
     }
   }
 
+  /**
+   * 实现 NodeHandler 接口，<trim /> 标签的处理器
+   */
   private class TrimHandler implements NodeHandler {
     public TrimHandler() {
       // Prevent Synthetic Access
@@ -167,16 +185,23 @@ public class XMLScriptBuilder extends BaseBuilder {
 
     @Override
     public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+      // <1> 调用 #parseDynamicTags(XNode node) 方法，解析内部的 SQL 节点，成 MixedSqlNode 对象
       MixedSqlNode mixedSqlNode = parseDynamicTags(nodeToHandle);
+      // <2> 获得 prefix、prefixOverrides、"suffix"、suffixOverrides 属性
       String prefix = nodeToHandle.getStringAttribute("prefix");
       String prefixOverrides = nodeToHandle.getStringAttribute("prefixOverrides");
       String suffix = nodeToHandle.getStringAttribute("suffix");
       String suffixOverrides = nodeToHandle.getStringAttribute("suffixOverrides");
+      // <3> 创建 TrimSqlNode 对象
       TrimSqlNode trim = new TrimSqlNode(configuration, mixedSqlNode, prefix, prefixOverrides, suffix, suffixOverrides);
+      // <4> 添加到 targetContents 中
       targetContents.add(trim);
     }
   }
 
+  /**
+   * 实现 NodeHandler 接口，<where /> 标签的处理器
+   */
   private class WhereHandler implements NodeHandler {
     public WhereHandler() {
       // Prevent Synthetic Access
@@ -184,12 +209,18 @@ public class XMLScriptBuilder extends BaseBuilder {
 
     @Override
     public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+      // 解析内部的 SQL 节点，成 MixedSqlNode 对象
       MixedSqlNode mixedSqlNode = parseDynamicTags(nodeToHandle);
+      // 创建 WhereSqlNode 对象
       WhereSqlNode where = new WhereSqlNode(configuration, mixedSqlNode);
+      // 添加到 targetContents 中
       targetContents.add(where);
     }
   }
 
+  /**
+   * 实现 NodeHandler 接口，<set /> 标签的处理器
+   */
   private class SetHandler implements NodeHandler {
     public SetHandler() {
       // Prevent Synthetic Access
@@ -197,12 +228,18 @@ public class XMLScriptBuilder extends BaseBuilder {
 
     @Override
     public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+      // 解析内部的 SQL 节点，成 MixedSqlNode 对象
       MixedSqlNode mixedSqlNode = parseDynamicTags(nodeToHandle);
+      // 创建 SetSqlNode 对象
       SetSqlNode set = new SetSqlNode(configuration, mixedSqlNode);
+      // 添加到 targetContents 中
       targetContents.add(set);
     }
   }
 
+  /**
+   * 实现 NodeHandler 接口，<foreach /> 标签的处理器
+   */
   private class ForEachHandler implements NodeHandler {
     public ForEachHandler() {
       // Prevent Synthetic Access
@@ -210,18 +247,25 @@ public class XMLScriptBuilder extends BaseBuilder {
 
     @Override
     public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+      // 解析内部的 SQL 节点，成 MixedSqlNode 对象
       MixedSqlNode mixedSqlNode = parseDynamicTags(nodeToHandle);
+      // 获得 collection、item、index、open、close、separator 属性
       String collection = nodeToHandle.getStringAttribute("collection");
       String item = nodeToHandle.getStringAttribute("item");
       String index = nodeToHandle.getStringAttribute("index");
       String open = nodeToHandle.getStringAttribute("open");
       String close = nodeToHandle.getStringAttribute("close");
       String separator = nodeToHandle.getStringAttribute("separator");
+      // 创建 ForEachSqlNode 对象
       ForEachSqlNode forEachSqlNode = new ForEachSqlNode(configuration, mixedSqlNode, collection, index, item, open, close, separator);
+      // 添加到 targetContents 中
       targetContents.add(forEachSqlNode);
     }
   }
 
+  /**
+   * 实现 NodeHandler 接口，<if /> 标签的处理器
+   */
   private class IfHandler implements NodeHandler {
     public IfHandler() {
       // Prevent Synthetic Access
@@ -229,13 +273,20 @@ public class XMLScriptBuilder extends BaseBuilder {
 
     @Override
     public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+      // 解析内部的 SQL 节点，成 MixedSqlNode 对象
       MixedSqlNode mixedSqlNode = parseDynamicTags(nodeToHandle);
+      // 获得 test 属性
       String test = nodeToHandle.getStringAttribute("test");
+      // 创建 IfSqlNode 对象
       IfSqlNode ifSqlNode = new IfSqlNode(mixedSqlNode, test);
+      // 添加到 targetContents 中
       targetContents.add(ifSqlNode);
     }
   }
 
+  /**
+   * 实现 NodeHandler 接口，<otherwise /> 标签的处理器
+   */
   private class OtherwiseHandler implements NodeHandler {
     public OtherwiseHandler() {
       // Prevent Synthetic Access
@@ -243,11 +294,16 @@ public class XMLScriptBuilder extends BaseBuilder {
 
     @Override
     public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
+      // 解析内部的 SQL 节点，成 MixedSqlNode 对象
       MixedSqlNode mixedSqlNode = parseDynamicTags(nodeToHandle);
+      // 添加到 targetContents 中
       targetContents.add(mixedSqlNode);
     }
   }
 
+  /**
+   * 实现 NodeHandler 接口，<choose /> 标签的处理器
+   */
   private class ChooseHandler implements NodeHandler {
     public ChooseHandler() {
       // Prevent Synthetic Access
@@ -257,9 +313,13 @@ public class XMLScriptBuilder extends BaseBuilder {
     public void handleNode(XNode nodeToHandle, List<SqlNode> targetContents) {
       List<SqlNode> whenSqlNodes = new ArrayList<>();
       List<SqlNode> otherwiseSqlNodes = new ArrayList<>();
+      // 解析 `<when />` 和 `<otherwise />` 的节点们
       handleWhenOtherwiseNodes(nodeToHandle, whenSqlNodes, otherwiseSqlNodes);
+      // 获得 `<otherwise />` 的节点
       SqlNode defaultSqlNode = getDefaultSqlNode(otherwiseSqlNodes);
+      // 创建 ChooseSqlNode 对象
       ChooseSqlNode chooseSqlNode = new ChooseSqlNode(whenSqlNodes, defaultSqlNode);
+      // 添加到 targetContents 中
       targetContents.add(chooseSqlNode);
     }
 
@@ -268,14 +328,15 @@ public class XMLScriptBuilder extends BaseBuilder {
       for (XNode child : children) {
         String nodeName = child.getNode().getNodeName();
         NodeHandler handler = nodeHandlerMap.get(nodeName);
-        if (handler instanceof IfHandler) {
+        if (handler instanceof IfHandler) {// 处理 `<when />` 标签的情况
           handler.handleNode(child, ifSqlNodes);
-        } else if (handler instanceof OtherwiseHandler) {
+        } else if (handler instanceof OtherwiseHandler) { // 处理 `<otherwise />` 标签的情况
           handler.handleNode(child, defaultSqlNodes);
         }
       }
     }
 
+    // 至多允许有一个 SqlNode 节点
     private SqlNode getDefaultSqlNode(List<SqlNode> defaultSqlNodes) {
       SqlNode defaultSqlNode = null;
       if (defaultSqlNodes.size() == 1) {
