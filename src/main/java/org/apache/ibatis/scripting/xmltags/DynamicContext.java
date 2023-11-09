@@ -97,8 +97,14 @@ public class DynamicContext {
     return uniqueNumber++;
   }
 
+  /**
+   * 是 DynamicContext 的内部静态类，继承 HashMap 类，上下文的参数集合。该类在 HashMap 的基础上，增加支持对 parameterMetaObject 属性的访问
+   */
   static class ContextMap extends HashMap<String, Object> {
     private static final long serialVersionUID = 2977601501966151582L;
+    /**
+     * parameter 对应的 MetaObject 对象
+     */
     private final MetaObject parameterMetaObject;
     private final boolean fallbackParameterObject;
 
@@ -109,6 +115,7 @@ public class DynamicContext {
 
     @Override
     public Object get(Object key) {
+      // 如果有 key 对应的值，直接获得
       String strKey = (String) key;
       if (super.containsKey(strKey)) {
         return super.get(strKey);
@@ -118,6 +125,7 @@ public class DynamicContext {
         return null;
       }
 
+      // 从 parameterMetaObject 中，获得 key 对应的属性
       if (fallbackParameterObject && !parameterMetaObject.hasGetter(strKey)) {
         return parameterMetaObject.getOriginalObject();
       } else {
