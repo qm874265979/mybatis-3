@@ -30,19 +30,38 @@ import org.apache.ibatis.scripting.LanguageDriver;
 import org.apache.ibatis.session.Configuration;
 
 /**
+ * 实现 SqlSource 接口，基于方法上的 @ProviderXXX 注解的 SqlSource 实现类
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
 public class ProviderSqlSource implements SqlSource {
 
   private final Configuration configuration;
+  /**
+   * `@ProviderXXX` 注解的对应的类
+   */
   private final Class<?> providerType;
   private final LanguageDriver languageDriver;
   private final Method mapperMethod;
+  /**
+   * `@ProviderXXX` 注解的对应的方法
+   */
   private final Method providerMethod;
+  /**
+   * `@ProviderXXX` 注解的对应的方法的参数名数组
+   */
   private final String[] providerMethodArgumentNames;
+  /**
+   * `@ProviderXXX` 注解的对应的方法的参数类型数组
+   */
   private final Class<?>[] providerMethodParameterTypes;
+  /**
+   * 若 {@link #providerMethodParameterTypes} 参数有 ProviderContext 类型的，创建 ProviderContext 对象
+   */
   private final ProviderContext providerContext;
+  /**
+   * {@link #providerMethodParameterTypes} 参数中，ProviderContext 类型的参数，在数组中的位置
+   */
   private final Integer providerContextIndex;
 
   /**
@@ -100,6 +119,7 @@ public class ProviderSqlSource implements SqlSource {
       this.mapperMethod = mapperMethod;
       Lang lang = mapperMethod == null ? null : mapperMethod.getAnnotation(Lang.class);
       this.languageDriver = configuration.getLanguageDriver(lang == null ? null : lang.value());
+      // 获得 @ProviderXXX 注解的对应的类
       this.providerType = getProviderType(configuration, provider, mapperMethod);
       candidateProviderMethodName = (String) provider.annotationType().getMethod("method").invoke(provider);
 
@@ -129,6 +149,7 @@ public class ProviderSqlSource implements SqlSource {
       throw new BuilderException("Error creating SqlSource for SqlProvider. Method '"
           + candidateProviderMethodName + "' not found in SqlProvider '" + this.providerType.getName() + "'.");
     }
+    // 获得 @ProviderXXX 注解的对应的方法相关的信息
     this.providerMethod = candidateProviderMethod;
     this.providerMethodArgumentNames = new ParamNameResolver(configuration, this.providerMethod).getNames();
     this.providerMethodParameterTypes = this.providerMethod.getParameterTypes();
@@ -147,18 +168,23 @@ public class ProviderSqlSource implements SqlSource {
         candidateProviderContextIndex = i;
       }
     }
+    // 初始化 providerContext 和 providerContextIndex 属性
     this.providerContext = candidateProviderContext;
     this.providerContextIndex = candidateProviderContextIndex;
   }
 
   @Override
   public BoundSql getBoundSql(Object parameterObject) {
+    // <1> 调用 #createSqlSource(Object parameterObject) 方法，创建 SqlSource 对象。
+    // 因为它是通过 @ProviderXXX 注解的指定类的指定方法，动态生成 SQL 。所以，从思路上，和 DynamicSqlSource 是有点接近的。
     SqlSource sqlSource = createSqlSource(parameterObject);
+    // <2> 获得 BoundSql 对象
     return sqlSource.getBoundSql(parameterObject);
   }
 
   private SqlSource createSqlSource(Object parameterObject) {
     try {
+      // <1> 获得 SQL
       String sql;
       if (parameterObject instanceof Map) {
         int bindParameterCount = providerMethodParameterTypes.length - (providerContext == null ? 0 : 1);
@@ -185,7 +211,10 @@ public class ProviderSqlSource implements SqlSource {
           + "' with specify parameter '" + (parameterObject == null ? null : parameterObject.getClass())
           + "' because SqlProvider method arguments for '" + mapperMethod + "' is an invalid combination.");
       }
+      // <2> 获得参数
       Class<?> parameterType = parameterObject == null ? Object.class : parameterObject.getClass();
+      // <3> 替换掉 SQL 上的属性
+      // <4> 调用 SqlSourceBuilder#parse(String originalSql, Class<?> parameterType, Map<String, Object> additionalParameters) 方法，解析出 SqlSource 对象
       return languageDriver.createSqlSource(configuration, sql, parameterType);
     } catch (BuilderException e) {
       throw e;
