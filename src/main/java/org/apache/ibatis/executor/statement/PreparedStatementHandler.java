@@ -33,6 +33,7 @@ import org.apache.ibatis.session.ResultHandler;
 import org.apache.ibatis.session.RowBounds;
 
 /**
+ * 继承 BaseStatementHandler 抽象类，java.sql.PreparedStatement 的 StatementHandler 实现类
  * @author Clinton Begin
  */
 public class PreparedStatementHandler extends BaseStatementHandler {
@@ -44,9 +45,12 @@ public class PreparedStatementHandler extends BaseStatementHandler {
   @Override
   public int update(Statement statement) throws SQLException {
     PreparedStatement ps = (PreparedStatement) statement;
+    // 执行写操作
     ps.execute();
+    // 获得更新数量
     int rows = ps.getUpdateCount();
     Object parameterObject = boundSql.getParameterObject();
+    // 执行 keyGenerator 的后置处理逻辑
     KeyGenerator keyGenerator = mappedStatement.getKeyGenerator();
     keyGenerator.processAfter(executor, mappedStatement, ps, parameterObject);
     return rows;
@@ -55,26 +59,32 @@ public class PreparedStatementHandler extends BaseStatementHandler {
   @Override
   public void batch(Statement statement) throws SQLException {
     PreparedStatement ps = (PreparedStatement) statement;
+    // 添加到批处理
     ps.addBatch();
   }
 
   @Override
   public <E> List<E> query(Statement statement, ResultHandler resultHandler) throws SQLException {
     PreparedStatement ps = (PreparedStatement) statement;
+    // 执行查询
     ps.execute();
+    // 处理返回结果
     return resultSetHandler.handleResultSets(ps);
   }
 
   @Override
   public <E> Cursor<E> queryCursor(Statement statement) throws SQLException {
     PreparedStatement ps = (PreparedStatement) statement;
+    // 执行查询
     ps.execute();
+    // 处理返回的 Cursor 结果
     return resultSetHandler.handleCursorResultSets(ps);
   }
 
   @Override
   protected Statement instantiateStatement(Connection connection) throws SQLException {
     String sql = boundSql.getSql();
+    // <1> 处理 Jdbc3KeyGenerator 的情况
     if (mappedStatement.getKeyGenerator() instanceof Jdbc3KeyGenerator) {
       String[] keyColumnNames = mappedStatement.getKeyColumns();
       if (keyColumnNames == null) {
@@ -82,8 +92,10 @@ public class PreparedStatementHandler extends BaseStatementHandler {
       } else {
         return connection.prepareStatement(sql, keyColumnNames);
       }
+      // <2>
     } else if (mappedStatement.getResultSetType() == ResultSetType.DEFAULT) {
       return connection.prepareStatement(sql);
+      // <3>
     } else {
       return connection.prepareStatement(sql, mappedStatement.getResultSetType().getValue(), ResultSet.CONCUR_READ_ONLY);
     }
@@ -91,6 +103,7 @@ public class PreparedStatementHandler extends BaseStatementHandler {
 
   @Override
   public void parameterize(Statement statement) throws SQLException {
+    //调用 ParameterHandler#setParameters(PreparedStatement ps) 方法，设置 PreparedStatement 的占位符参数
     parameterHandler.setParameters((PreparedStatement) statement);
   }
 
