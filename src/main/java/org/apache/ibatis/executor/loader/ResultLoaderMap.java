@@ -279,6 +279,9 @@ public class ResultLoaderMap {
     }
   }
 
+  /**
+   * 在 ResultLoaderMap 类中，有一个 ClosedExecutor 内部静态类，继承 BaseExecutor 抽象类，已经关闭的 Executor 实现类
+   */
   private static final class ClosedExecutor extends BaseExecutor {
 
     public ClosedExecutor() {
