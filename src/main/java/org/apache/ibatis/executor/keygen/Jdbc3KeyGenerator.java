@@ -44,6 +44,7 @@ import org.apache.ibatis.type.TypeHandler;
 import org.apache.ibatis.type.TypeHandlerRegistry;
 
 /**
+ * 实现 KeyGenerator 接口，基于 Statement#getGeneratedKeys() 方法的 KeyGenerator 实现类，适用于 MySQL、H2 主键生成
  * @author Clinton Begin
  * @author Kazuki Shimizu
  */
@@ -52,6 +53,7 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
   private static final String SECOND_GENERIC_PARAM_NAME = ParamNameResolver.GENERIC_NAME_PREFIX + "2";
 
   /**
+   * 共享的单例
    * A shared instance.
    *
    * @since 3.4.3
@@ -64,18 +66,22 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
   @Override
   public void processBefore(Executor executor, MappedStatement ms, Statement stmt, Object parameter) {
     // do nothing
+    //空实现。因为对于 Jdbc3KeyGenerator 类的主键，是在 SQL 执行后，才生成
   }
 
   @Override
   public void processAfter(Executor executor, MappedStatement ms, Statement stmt, Object parameter) {
+    //调用 #processBatch(Executor executor, MappedStatement ms, Statement stmt, Object parameter) 方法，处理返回的自增主键。单个 parameter 参数，可以认为是批量的一个特例
     processBatch(ms, stmt, parameter);
   }
 
   public void processBatch(MappedStatement ms, Statement stmt, Object parameter) {
+    // <1> 获得主键属性的配置。如果为空，则直接返回，说明不需要主键
     final String[] keyProperties = ms.getKeyProperties();
     if (keyProperties == null || keyProperties.length == 0) {
       return;
     }
+    // <2> 获得返回的自增主键
     try (ResultSet rs = stmt.getGeneratedKeys()) {
       final ResultSetMetaData rsmd = rs.getMetaData();
       final Configuration configuration = ms.getConfiguration();
@@ -92,8 +98,10 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
   @SuppressWarnings("unchecked")
   private void assignKeys(Configuration configuration, ResultSet rs, ResultSetMetaData rsmd, String[] keyProperties,
       Object parameter) throws SQLException {
+    // <1> 如果非 Map 对象，则直接返回 parameter
     if (parameter instanceof ParamMap || parameter instanceof StrictMap) {
       // Multi-param or single param with @Param
+      //设置主键们，到参数 soleParam 中
       assignKeysToParamMap(configuration, rs, rsmd, keyProperties, (Map<String, ?>) parameter);
     } else if (parameter instanceof ArrayList && !((ArrayList<?>) parameter).isEmpty()
         && ((ArrayList<?>) parameter).get(0) instanceof ParamMap) {
@@ -111,10 +119,12 @@ public class Jdbc3KeyGenerator implements KeyGenerator {
     if (params.isEmpty()) {
       return;
     }
+    // <1> 包装成 Collection 对象
     List<KeyAssigner> assignerList = new ArrayList<>();
     for (int i = 0; i < keyProperties.length; i++) {
       assignerList.add(new KeyAssigner(configuration, rsmd, i + 1, null, keyProperties[i]));
     }
+    // <2> 遍历 paramAsCollection 数组
     Iterator<?> iterator = params.iterator();
     while (rs.next()) {
       if (!iterator.hasNext()) {
