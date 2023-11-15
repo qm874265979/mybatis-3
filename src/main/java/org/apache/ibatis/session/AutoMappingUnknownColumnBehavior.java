@@ -20,6 +20,7 @@ import org.apache.ibatis.logging.LogFactory;
 import org.apache.ibatis.mapping.MappedStatement;
 
 /**
+ * <P>指定检测到自动映射目标的未知列（或未知属性类型）时的行为</P>
  * Specify the behavior when detects an unknown column (or unknown property type) of automatic mapping target.
  *
  * @since 3.4.0
