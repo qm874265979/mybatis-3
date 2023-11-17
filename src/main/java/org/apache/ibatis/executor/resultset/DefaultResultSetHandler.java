@@ -999,7 +999,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       // <3.2> 获得 CacheKey 对象
       final CacheKey key = executor.createCacheKey(nestedQuery, nestedQueryParameterObject, RowBounds.DEFAULT, nestedBoundSql);
       final Class<?> targetType = constructorMapping.getJavaType();
-      // <3.3> 创建 ResultLoader 对象
+      // <3.3> 创建 ResultLoader 对象--->延迟加载入口
       final ResultLoader resultLoader = new ResultLoader(configuration, executor, nestedQuery, nestedQueryParameterObject, targetType, key, nestedBoundSql);
       // <3.3> 调用 ResultLoader#loadResult() 方法，加载结果
       value = resultLoader.loadResult();
