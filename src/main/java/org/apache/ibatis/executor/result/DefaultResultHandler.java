@@ -23,10 +23,14 @@ import org.apache.ibatis.session.ResultContext;
 import org.apache.ibatis.session.ResultHandler;
 
 /**
+ * 实现 ResultHandler 接口，默认的 ResultHandler 的实现类
  * @author Clinton Begin
  */
 public class DefaultResultHandler implements ResultHandler<Object> {
 
+  /**
+   * 结果集合
+   */
   private final List<Object> list;
 
   public DefaultResultHandler() {
@@ -40,6 +44,7 @@ public class DefaultResultHandler implements ResultHandler<Object> {
 
   @Override
   public void handleResult(ResultContext<?> context) {
+    // <1> 将当前结果，添加到结果集合中
     list.add(context.getResultObject());
   }
 
