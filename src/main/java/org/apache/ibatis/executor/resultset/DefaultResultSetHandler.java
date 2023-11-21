@@ -794,6 +794,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       for (ResultMapping propertyMapping : propertyMappings) {
         // issue gcode #109 && issue #149
         if (propertyMapping.getNestedQueryId() != null && propertyMapping.isLazy()) {
+          // 调用 ProxyFactory#createProxy(...) 方法，创建结果对象的代理对象
           resultObject = configuration.getProxyFactory().createProxy(resultObject, lazyLoader, configuration, objectFactory, constructorArgTypes, constructorArgs);
           break;
         }
