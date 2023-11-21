@@ -100,6 +100,12 @@ public class SqlSessionFactoryBuilder {
     }
   }
 
+  /**
+   * 创建 DefaultSqlSessionFactory 对象
+   *
+   * @param config Configuration 对象
+   * @return DefaultSqlSessionFactory 对象
+   */
   public SqlSessionFactory build(Configuration config) {
     return new DefaultSqlSessionFactory(config);
   }
