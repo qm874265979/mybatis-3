@@ -1031,7 +1031,7 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       final Class<?> targetType = propertyMapping.getJavaType();
       // <1> 调用 Executor#isCached(MappedStatement ms, CacheKey key) 方法，检查缓存中已存在
       if (executor.isCached(nestedQuery, key)) {// 有缓存
-        // <2.1> 调用 Executor#deferLoad(...) 方法，创建 DeferredLoad 对象，并通过该 DeferredLoad 对象从缓存中加载结采对象
+        // <2.1> 调用 Executor#deferLoad(...) 方法，创建 DeferredLoad 对象，并通过该 DeferredLoad 对象从缓存中加载结果对象
         executor.deferLoad(nestedQuery, metaResultObject, property, key, targetType);
         // <2.2> 返回已定义 DEFERED
         value = DEFERRED;
@@ -1039,7 +1039,9 @@ public class DefaultResultSetHandler implements ResultSetHandler {
       } else {// 无缓存
         // <3.1> 创建 ResultLoader 对象
         final ResultLoader resultLoader = new ResultLoader(configuration, executor, nestedQuery, nestedQueryParameterObject, targetType, key, nestedBoundSql);
-        // <3.2> 如果要求延迟加载，则延迟加载
+        // <3.2> 如果要求延迟加载，则延迟加载。因为是结果对象的 setting 方法中使用的值，可以使用延迟加载的功能，所以使用 ResultLoaderMap 记录。
+        // 最终会创建结果对象的代理对象，而 ResultLoaderMap 对象会传入其中，作为一个参数。
+        // 从而能够，在加载该属性时，能够调用 ResultLoader#loadResult() 方法，加载结果
         if (propertyMapping.isLazy()) {
           // 调用 ResultLoader#addLoader(...) 方法，如果该属性配置了延迟加载，则将其添加到 ResultLoader.loaderMap 中，等待真正使用时再执行嵌套查询并得到结果对象
           lazyLoader.addLoader(property, metaResultObject, resultLoader);
